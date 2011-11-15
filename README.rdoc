@@ -17,8 +17,11 @@ http://flta.jb-jk.net/
   BUNDLE_PATH: vendor/bundle
 
 bundle install
+
 bundle exec rake db:migrate
+
 bundle exec rake db:seed
+
 bundle exec rails server
 
 == License
