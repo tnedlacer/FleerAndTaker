@@ -16,13 +16,17 @@ http://flta.jb-jk.net/
   BUNDLE_DISABLE_SHARED_GEMS: "1"
   BUNDLE_PATH: vendor/bundle
 
-bundle install
+Get "oauth_consumer_key" and "oauth_consumer_secret" on Twitter.
 
-bundle exec rake db:migrate
+Write it in a "config/twitter_auth.yml"
 
-bundle exec rake db:seed
+$ bundle install
 
-bundle exec rails server
+$ bundle exec rake db:migrate
+
+$ bundle exec rake db:seed
+
+$ bundle exec rails server
 
 == License
 
