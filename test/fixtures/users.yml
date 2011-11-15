@@ -1,0 +1,6 @@
+cpu:
+ id: 0
+ name: 'CPU'
+ login: 'CPU'
+ twitter_id: 0
+ profile_image_url: '/images/cpu.gif'

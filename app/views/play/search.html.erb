@@ -1,0 +1,19 @@
+<h1>Search Player</h1>
+<div class="main">
+<div class="container">
+<%= form_tag '', :method => :get do %>
+<%= text_field_tag :name, params[:name] %>
+<%= submit_tag 'Search!!' %>
+<% end %>
+<div class="players">
+<%- @user_list.map do |user| -%>
+<%= link_to("#{image_tag(user.profile_image_url)}#{h(user.is_a?(User) ? user.name : user.screen_name)}".html_safe,
+  user.id == current_user.twitter_id.to_i ? "#" : {:action => :new, :id => user.id},
+  user.id == current_user.twitter_id.to_i ? {:onclick => 'alert("you")'} : {}
+) %>
+<%- end -%>
+<br style="clear:both;" />
+</div>
+</div>
+<%= return_to_index %>
+</div>

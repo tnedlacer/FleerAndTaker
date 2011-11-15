@@ -1,0 +1,10 @@
+<table class="turn">
+<%- [:fleer, :taker].map do |ft| -%>
+<tr class="<%= ft %>">
+<td class="ft"><%= @game.try("#{ft}_title") %></td>
+<%- (0..Game::EscapedTurn).map do |i| -%>
+<td<%= ' class="cur"'.html_safe if i == @game.try("#{ft}_turn") %>><%= i %></td>
+<%- end -%>
+</tr>
+<%- end -%>
+</table>

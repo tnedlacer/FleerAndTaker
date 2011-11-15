@@ -1,0 +1,28 @@
+<h1>Role Select</h1>
+<div class="main">
+<div class="container" style="width:500px">
+<%= form_tag :action => :create, :id => @opposite.id do %>
+<table class="role_select">
+<%- if flash[:notice].present? -%>
+<caption><%= flash[:notice] %></caption>
+<%- end -%>
+<tr>
+<td><%= image_tag(current_user.profile_image_url) %><br /><%= current_user.login %></td>
+<td>VS</td>
+<td><%= image_tag(@opposite.profile_image_url) %><br /><%= @opposite.is_a?(User) ? @opposite.name : @opposite.screen_name %></td>
+</tr>
+<tr>
+<td>
+<%= label_tag :ft1, "#{radio_button_tag(:ft, 1, false, :id => :ft1)}fleer".html_safe %>
+<%= label_tag :ft2, "#{radio_button_tag(:ft, 2, false, :id => :ft2)}taker".html_safe %>
+</td>
+<td><%= submit_tag "Start" %></td>
+<td></td>
+</tr>
+</table>
+<% end %>
+
+
+</div>
+<%= return_to_index %>
+</div>

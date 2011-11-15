@@ -1,0 +1,68 @@
+<%= render :partial => 'play/turn' %>
+<p><%= flash[:notice] %></p>
+<%- if @game.opposite == User.cpu -%>
+<p>Move the CPU if you move</p>
+<%- else -%>
+<p><%= @game.opposite.login %> <%= @game.opposite_moved? ? 'moved' : 'still not moving' %></p>
+<%- end -%>
+<p><%= flash[:move] %></p>
+<div class="left">
+<%-
+key_anchor = proc{|x,y|""}
+if @game.can_put_key?
+  key_anchor = proc{|x,y| link_to_function("Set key", "set_key(#{x},#{y})", :class => 'key_anchor').html_safe}
+end
+-%>
+<table class="game">
+<%- Game::BlockRange.map do |y| -%>
+<tr>
+<%- Game::BlockRange.map do |x| -%>
+<%- _text, _class = @game.xy_text_and_class([x,y]) -%>
+<td<%= ' class="unfixed"'.html_safe if _class.present? && @game.opposite_turn < @game.user_turn %>>
+<%- if !@game.finished? && @game.user_movable? && @game.movable?([x,y]) -%>
+<%= link_to_function _text, "move_to(#{x},#{y})", :class => ["move", _class].compact.join(" "), :title => _text %>
+<%- else -%>
+<div class="<%= [( @game.user_movable? ? "not_moving" : ''), _class].compact.join(" ") %>" title="<%= _text %>"><%= _text %></div>
+<%- end -%>
+<%= key_anchor.call(x,y) %>
+</td>
+<%- end -%>
+</tr>
+<%- end -%>
+</table>
+<%- unless @game.finished? -%>
+<%= form_tag({:action => :move, :id => @game.id}, :name => :move_form) do %>
+<%= hidden_field_tag :x %>
+<%= hidden_field_tag :y %>
+<%= hidden_field_tag :key, 0 %>
+<% end %>
+<%= javascript_tag :defer => 'defer' do %>
+function move_to(_x,_y){
+  if(confirm("Move to "+_x+", "+_y+"?")){
+    move_form_submit(_x,_y)
+  }
+}
+function set_key(_x,_y){
+  if(confirm("Set key "+_x+", "+_y+"?")){
+    document.getElementById("key").value = 1;
+    move_form_submit(_x,_y)
+  }
+}
+function move_form_submit(_x,_y){
+  document.getElementById("x").value = _x;
+  document.getElementById("y").value = _y;
+  document.move_form.submit();
+}
+<% end %>
+<%- end -%>
+<%= render :partial => 'play/tweet_button' %>
+</div>
+<%- if @game.can_cancel? -%>
+<%= form_tag({:action => :cancel, :id => @game.id}) do %>
+<%= submit_tag "To cancel the game." %>
+<% end %>
+<%- else -%>
+<%= form_tag({:action => :give_up, :id => @game.id}) do %>
+<%= submit_tag "give up" %>
+<% end %>
+<%- end -%>

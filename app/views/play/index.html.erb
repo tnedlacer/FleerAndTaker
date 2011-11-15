@@ -1,0 +1,31 @@
+<h1><%= current_user.login %>'s Play Game</h1>
+<div class="main">
+<div class="container">
+<div class="win_loss"><%= pluralize(current_user.win_games.count, 'win') %> / <%= pluralize(current_user.loss_games.count, 'loss') %></div>
+<%- if current_user.too_many_games? -%>
+<%= link_to_function 'New', 'alert("Too many games.")', :class => 'new' %>
+<%- else -%>
+<%= link_to 'New', {:action => :search}, :class => 'new' %>
+<%- end -%>
+<div class="games">
+<%- 
+@games = current_user.games.includes([:fleer, :taker]).page(params[:page])
+@games.each_with_index do |_game, i|
+  concat(link_to(_game.title,
+    play_game_path(_game.id),
+    :class => [
+      _game.list_class,
+      ((current_user.id == _game.fleer_id && _game.load_app_data[:fleer_win]) || (current_user.id == _game.taker_id && _game.load_app_data[:taker_win]) ? 'win' : '')
+    ],
+    :style => "width:#{400 + i * 40}px"
+    )
+  )
+end
+-%>
+</div>
+<%= paginate @games %>
+</div>
+<%= form_tag({:action => :accept_only_friends}) do %>
+<%= submit_tag current_user.accept_only_friends? ? "Everyone accepts." : "Accept Only friends." %>
+<% end %>
+</div>

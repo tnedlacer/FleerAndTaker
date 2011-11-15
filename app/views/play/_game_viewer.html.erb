@@ -1,0 +1,43 @@
+<%- if @game.winner.present? -%>
+<h2 class="winner"><%= "#{@game.winner_user.login} win!!" %></h2>
+<%- end -%>
+<%= render :partial => 'play/turn' %>
+<div class="left">
+<%-
+if @game.fleer_turn == @game.taker_turn
+  fleer_move = @game.fleer_moves.last
+  taker_move = @game.taker_moves.last
+else
+  fleer_move = @game.fleer_moves[@game.fleer_turn > @game.taker_turn ? -2 : -1]
+  taker_move = @game.taker_moves[@game.fleer_turn < @game.taker_turn ? -2 : -1]
+end
+xy_values = {}
+xy_values[:fleer] = fleer_move.to_xy if fleer_move.present?
+xy_values[:taker] = taker_move.to_xy if taker_move.present?
+xy_values[:fleer] ||= @game.fleer_init_xy
+xy_values[:taker] ||= @game.taker_init_xy
+xy_values[:key] = @game.key_xy
+-%>
+<table class="game">
+<%- Game::BlockRange.map do |y| -%>
+<tr>
+<%- Game::BlockRange.map do |x| -%>
+<td>
+<%-
+_class = []
+_text = []
+[:fleer,:taker,:key].map do |attr|
+  if xy_values[attr] == [x,y]
+    _class << attr.to_s
+    _text << (attr == :key ? 'Key' : @game.try(attr).login)
+  end
+end
+-%>
+<div<%= (' class="'+_class.join("_")+'"').html_safe if _class.present? %>><%= _text.present? ? _text.join(" & ") : '&nbsp;'.html_safe %></div>
+</td>
+<%- end -%>
+</tr>
+<%- end -%>
+</table>
+<%= render :partial => 'play/tweet_button' %>
+</div>

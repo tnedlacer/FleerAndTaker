@@ -1,0 +1,24 @@
+<%-
+title = ''
+if current_user && current_user.id == @game.fleer_id
+  title << "<span class=\"current\">#{h(@game.fleer_title)}</span>"
+else
+  title << h(@game.fleer_title)
+end
+title << ' - '
+if current_user && current_user.id == @game.taker_id
+  title << "<span class=\"current\">#{h(@game.taker_title)}</span>"
+else
+  title << h(@game.taker_title)
+end
+-%>
+<h1><%= title.html_safe %></h1>
+<div class="main">
+<div class="container">
+<div class="right">
+<%= render :partial => "play/talk" %>
+</div>
+<%= render :partial => "play/game_#{@game.current_user.blank? || @game.finished? ? 'viewer' : 'player'}" %>
+</div>
+<%= return_to_index %>
+</div>

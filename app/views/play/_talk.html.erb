@@ -1,0 +1,80 @@
+<%- talk_count = 0 -%>
+<h3>Talks</h3>
+<%- @game.talks.each_with_index do |talk, i| -%>
+<%- talk_count += 1 -%>
+<div class="talk">
+<h4><%= talk.user.login %></h4>
+<%- if talk.say_block.present? -%>
+<table class="talk_block">
+<%- Game::BlockRange.map do |y| -%>
+<tr>
+<%- Game::BlockRange.map do |x| -%>
+<td><%= talk.say[:block]["#{x}_#{y}"] %></td>
+<%- end -%>
+</tr>
+<%- end -%>
+</table>
+<%- end -%>
+<%- if talk.say_message.present? -%>
+<p class="message"><%= talk.say[:message] %></p>
+<%- end -%>
+<%- if i < 3 -%>
+<div class="ad">
+</div>
+<%- end -%>
+</div>
+<%- end -%>
+<%- if @game.can_talk? -%>
+<%- talk_count += 1 -%>
+<div class="talk">
+<%-
+if @talk && @talk.errors.present?
+  _error_text = []
+  [:say, :turn, :game].map do |attr|
+    next if @talk.errors[attr].blank?
+    _error_text << @talk.errors[attr]
+  end
+  concat(_error_text.join(","))
+end
+-%>
+<%= form_tag({:action => :talk, :id => @game.id}) do %>
+<%- block_params = params[:block].is_a?(Hash) ? params[:block] : {} -%>
+<table class="talk_block">
+<%- Game::BlockRange.map do |y| -%>
+<tr>
+<%- Game::BlockRange.map do |x| -%>
+<td><%= text_field_tag "block[#{x}_#{y}]", block_params["#{x}_#{y}"], :onchange => 'text10(this);' %></td>
+<%- end -%>
+</tr>
+<%- end -%>
+</table>
+<%= text_area_tag :message, params[:message] %>
+<p class="submit"><%= submit_tag 'send' %></p>
+<% end %>
+</div>
+<%= javascript_tag :defer => 'defer' do %>
+function text10(elm){
+  _text = elm.value;
+  _count = 0;
+  _temp = '';
+  for(i = 0; i < _text.length; i++){
+    n = escape(_text.charAt(i));
+    if(n.length < 4){
+      _count++;
+    }else{
+      _count += 2;
+    }
+    if(_count <= 10){
+      _temp += _text.charAt(i);
+    }else{
+      break;
+    }
+  }
+  elm.value = _temp;
+}
+<% end %>
+<%- end -%>
+
+<%- if talk_count == 0 -%>
+<div class="talk">. . .</div>
+<%- end -%>

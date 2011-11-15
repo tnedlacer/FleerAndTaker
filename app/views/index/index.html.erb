@@ -1,0 +1,373 @@
+<%- content_for :javascript do -%>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/prototype/1.7.0.0/prototype.js"></script>
+<%- end -%>
+
+<h1>Fleer &amp; Taker</h1>
+<div class="main">
+<div class="container" style="width:872px;">
+<div class="menu">
+<ul>
+<li id="list1">"Fleer" and "Taker"</li>
+<li id="list2"><%= Game::MoveCount %> Blocks</li>
+<li id="list3"><%= Game::EscapedTurn %> Turn or Take</li>
+<li id="list4">Use "Key"</li>
+</ul>
+</div>
+<script src="http://widgets.twimg.com/j/2/widget.js"></script><script>
+new TWTR.Widget({
+  version: 2,
+  type: 'search',
+  search: 'FleerAndTaker',
+  interval: 6000,
+  title: 'FleerAndTaker',
+  subject: '',
+  width: 250,
+  height: 300,
+  theme: {
+    shell: {
+      background: '#4f6a75',
+      color: '#ffffff'
+    },
+    tweets: {
+      background: '#ffffff',
+      color: '#444444',
+      links: '#1985b5'
+    }
+  },
+  features: {
+    scrollbar: true,
+    loop: true,
+    live: true,
+    hashtags: true,
+    timestamp: true,
+    avatars: true,
+    toptweets: true,
+    behavior: 'default'
+  }
+}).render().start();
+</script>
+<table class="talk_block">
+<caption></caption>
+<%- Game::BlockRange.map do |y| -%>
+<tr>
+<%- Game::BlockRange.map do |x| -%>
+<td id="<%= "#{x}_#{y}" %>">&nbsp;</td>
+<%- end -%>
+</tr>
+<%- end -%>
+</table>
+</div>
+</div>
+<div class="play_game">
+<%= link_to "Play Game<br />(Twitter login)".html_safe, :controller => '/play' %>
+</div>
+<%= javascript_tag do %>
+var classes = {"f":"fleer","t":"taker","k":"key","fm":"fleer_move","tm":"taker_move","ftm":"fleer_taker_move","ft":"fleer_taker","fk":"fleer_key","ftk":"fleer_taker_key"};
+var current_points = {"f":[],"t":[],"k":[]};
+var _time = 0;
+Event.observe(window, 'load', function() {
+  setTimeout("list1_run()", 2000);
+});
+function list1_run(){
+  _time = 0;
+  talk_block_reset();
+  $("list4").removeClassName("run");
+  $("list1").addClassName("run");
+  [["f","1_1"],["t","3_3"]].each(function(ft_tag_id){
+    _time += 300;
+    setTimeout(function(){
+      $(ft_tag_id[1]).addClassName(classes[ft_tag_id[0]]);
+      $(ft_tag_id[1]).innerHTML = classes[ft_tag_id[0]];
+      $(ft_tag_id[1]).setStyle({verticalAlign: "top"});
+    }, _time);
+    ft_blink(classes[ft_tag_id[0]],ft_tag_id[1]);
+    _time += 500;
+    setTimeout(function(){
+      $(ft_tag_id[1]).removeClassName(classes[ft_tag_id[0]]);
+      $(ft_tag_id[1]).innerHTML = "";
+    }, _time);
+  });
+  _time += 300;
+  setTimeout(function(){
+    $("1_1").addClassName(classes["f"]);
+    $("1_1").innerHTML = classes["f"]
+    $("3_3").addClassName(classes["t"]);
+    $("3_3").innerHTML = classes["t"];
+  }, _time);
+  setTimeout("list2_run()", _time + 1500);
+}
+function ft_blink(_ft,_tag_id){
+  _time += 500;
+  setTimeout(function(){
+    $(_tag_id).removeClassName(_ft);
+  }, _time);
+  _time += 300;
+  setTimeout(function(){
+    $(_tag_id).addClassName(_ft);
+  }, _time);
+  _time += 500;
+  setTimeout(function(){
+    $(_tag_id).removeClassName(_ft);
+  }, _time);
+  _time += 300;
+  setTimeout(function(){
+    $(_tag_id).addClassName(_ft);
+  }, _time);
+}
+function list2_run(){
+  _time = 0;
+  $("list1").removeClassName("run");
+  $("list2").addClassName("run");
+  [
+    ["f",["1_1","1_2","1_3","2_1","2_2","3_1"]],
+    ["t",["3_3","3_2","3_1","2_3","2_2","1_3"]]
+  ].each(function(ft_tag_id){
+    ft_blink(classes[ft_tag_id[0]],ft_tag_id[1][0]);
+    _time += 300;
+    setTimeout(function(){
+      ft_tag_id[1].each(function(tag_id2){
+        $(tag_id2).addClassName(classes[ft_tag_id[0]+"m"]);
+      });
+    }, _time);
+    _time += 500;
+    setTimeout(function(){
+      ft_tag_id[1].each(function(tag_id2){
+        $(tag_id2).removeClassName(classes[ft_tag_id[0]+"m"]);
+      });
+    }, _time);
+    _time += 300;
+    setTimeout(function(){
+      ft_tag_id[1].each(function(tag_id2){
+        $(tag_id2).addClassName(classes[ft_tag_id[0]+"m"]);
+      });
+    }, _time);
+    _time += 800;
+    setTimeout(function(){
+      ft_tag_id[1].each(function(tag_id2){
+        $(tag_id2).removeClassName(classes[ft_tag_id[0]+"m"]);
+      });
+    }, _time);
+  });
+  _time += 300;
+  setTimeout(function(){
+    [
+      ["f",["1_1","1_2","2_1"]],
+      ["t",["3_3","3_2","2_3"]],
+      ["ft",["3_1","2_2","1_3"]]
+    ].each(function(ft_tag_id){
+      ft_tag_id[1].each(function(tag_id2){
+        $(tag_id2).addClassName(classes[ft_tag_id[0]+"m"]);
+      });
+      ft_tag_id[1].each(function(tag_id2){
+        $(tag_id2).addClassName(classes[ft_tag_id[0]+"m"]);
+      });
+    });
+  }, _time);
+  setTimeout("list3_run()", _time + 2000);
+}
+function list3_run(){
+  _time = 0;
+  talk_block_reset();
+
+  $("list2").removeClassName("run");
+  $("list3").addClassName("run");
+  [
+    ["1_1","3_3",""],
+    ["1_2","2_2","1"],
+    ["2_2","2_1"," --- 2"],
+    ["1_3","1_2"," --- 3"],
+    ["1_3","2_2"," --- 4"],
+    ["1_2","2_2"," --- 5"],
+  ].each(function(f_t_txt){
+    _time += 1500;
+    setTimeout(function(){
+      fleer_move(f_t_txt[0]);
+      taker_move(f_t_txt[1]);
+      $$('table.talk_block caption').each(function(elm){
+        elm.innerHTML += f_t_txt[2];
+      });
+    }, _time);
+  });
+  _time += 1500;
+  ft_blink(classes["f"],"1_2");
+  ft_blink(classes["f"],"1_2");
+  _time += 100;
+  setTimeout(function(){
+    $$('table.talk_block caption').each(function(elm){
+      elm.innerHTML = "Fleer WIN!!";
+    });
+  }, _time);
+  _time += 1500;
+  setTimeout(function(){
+    talk_block_reset();
+  }, _time);
+  _time += 500;
+  [
+    ["1_1","3_3",""],
+    ["1_3","2_2","1"],
+    ["2_3","3_3"," --- 2"],
+  ].each(function(f_t_txt){
+    _time += 1500;
+    setTimeout(function(){
+      fleer_move(f_t_txt[0]);
+      taker_move(f_t_txt[1]);
+      $$('table.talk_block caption').each(function(elm){
+        elm.innerHTML += f_t_txt[2];
+      });
+    }, _time);
+  });
+  _time += 1500;
+  setTimeout(function(){
+    $("2_3").removeClassName(classes["f"]);
+    $("3_3").removeClassName(classes["t"]);
+    $("3_2").addClassName(classes["ft"]);
+    $$('table.talk_block caption').each(function(elm){
+      elm.innerHTML += " --- 3";
+    });
+  }, _time);
+  _time += 1500;
+  ft_blink(classes["ft"],"3_2");
+  ft_blink(classes["ft"],"3_2");
+  _time += 100;
+  setTimeout(function(){
+    $$('table.talk_block caption').each(function(elm){
+      elm.innerHTML = "Taker WIN!!";
+    });
+  }, _time);
+  _time += 2000;
+  setTimeout("list4_run()", _time);
+}
+function talk_block_reset(){
+  classes_h = $H(classes);
+  $$('table.talk_block td').each(function(elm){
+    elm.innerHTML = '';
+    classes_h.each(function(pair){
+      elm.removeClassName(pair.value);
+    });
+  });
+  $$('table.talk_block caption').each(function(elm){
+    elm.innerHTML = '';
+  });
+  current_points = {"f":[],"t":[],"k":[]};
+}
+function list4_run(){
+  _time = 0;
+  talk_block_reset();
+
+  $("list3").removeClassName("run");
+  $("list4").addClassName("run");
+
+  fleer_move("1_1");
+  taker_move("3_3");
+  _time += 500;
+  ft_blink(classes["t"],"3_3");
+  ft_blink(classes["t"],"3_3");
+
+  _time += 1000;
+  setTimeout(function(){
+    $$('table.talk_block td').each(function(elm){
+      elm.removeClassName(classes["f"]);
+      elm.removeClassName(classes["t"]);
+      elm.addClassName(classes["k"]);
+    });
+  }, _time);
+  (4).times(function(){
+    _time += 500;
+    setTimeout(function(){
+      $$('table.talk_block td').each(function(elm){
+        elm.removeClassName(classes["k"]);
+      });
+    }, _time);
+    _time += 300;
+    setTimeout(function(){
+      $$('table.talk_block td').each(function(elm){
+        elm.addClassName(classes["k"]);
+      });
+    }, _time);
+  });
+  _time += 1500;
+  setTimeout(function(){
+    talk_block_reset();
+    fleer_move("1_1");
+    taker_move("3_3");
+  }, _time);
+  _time += 500;
+  ft_blink(classes["t"],"3_3");
+  setTimeout(function(){
+    key_set("2_3");
+  }, _time);
+  _time += 1500;
+  setTimeout(function(){
+    fleer_move("1_3");
+    taker_move("2_2");
+  }, _time);
+  _time += 1500;
+  setTimeout(function(){
+    taker_move("3_3");
+    $("1_3").removeClassName(classes["f"]);
+    $("2_3").removeClassName(classes["k"]);
+    $("2_3").addClassName(classes["fk"]);
+  }, _time);
+  _time += 1500;
+  ft_blink(classes["fk"],"2_3");
+  ft_blink(classes["fk"],"2_3");
+  _time += 100;
+  setTimeout(function(){
+    $$('table.talk_block caption').each(function(elm){
+      elm.innerHTML = "Fleer WIN!!";
+    });
+  }, _time);
+
+  _time += 1500;
+  setTimeout(function(){
+    talk_block_reset();
+    fleer_move("1_1");
+    taker_move("3_3");
+  }, _time);
+  _time += 500;
+  setTimeout(function(){
+    key_set("2_3");
+  }, _time);
+  _time += 1500;
+  setTimeout(function(){
+    fleer_move("1_3");
+    taker_move("2_2");
+  }, _time);
+  _time += 1500;
+  setTimeout(function(){
+    $("1_3").removeClassName(classes["f"]);
+    $("2_3").removeClassName(classes["k"]);
+    $("2_2").removeClassName(classes["t"]);
+    $("2_3").addClassName(classes["ftk"]);
+  }, _time);
+  _time += 1500;
+  ft_blink(classes["ftk"],"2_3");
+  ft_blink(classes["ftk"],"2_3");
+  _time += 100;
+  setTimeout(function(){
+    $$('table.talk_block caption').each(function(elm){
+      elm.innerHTML = "Taker WIN!!";
+    });
+  }, _time);
+
+  setTimeout("list1_run()", _time + 5000);
+}
+
+function fleer_move(_to){
+  move("f", _to);
+}
+function taker_move(_to){
+  move("t", _to);
+}
+function key_set(_to){
+  move("k", _to);
+}
+function move(target, _to){
+  _from = current_points[target].pop();
+  if(_from){
+    $(_from).removeClassName(classes[target]);
+  }
+  $(_to).addClassName(classes[target]);
+  current_points[target].push(_to);
+}
+<% end %>
